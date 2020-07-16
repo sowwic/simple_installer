@@ -123,3 +123,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#Project specific
+.vscode/
+.dsInstallerEnv/
+.pypi/

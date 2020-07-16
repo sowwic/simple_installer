@@ -1,2 +1,2 @@
 # dsInstaller
- Simple installer for github packages
+ Simple installer for zip packages
