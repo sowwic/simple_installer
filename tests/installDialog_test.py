@@ -6,7 +6,7 @@ from PySide2 import QtWidgets
 
 if __name__ == "__main__":
     # Init installer
-    Installer = installFn.Installer(fileUrl="https://github.com/S0nic014/dsRenamingTool/archive/2.0.zip")
+    Installer = installFn.Installer(fileUrl="https://github.com/S0nic014/dsRenamingTool/archive/1.0.zip")
 
     # Create app
     app = QtWidgets.QApplication(os.sys.argv)

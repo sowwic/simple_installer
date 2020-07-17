@@ -102,7 +102,7 @@ class Installer(object):
                 with open(self.tempPath, "wb") as outFile:
                     outFile.write(dlFile.read())
             self._returnStatus = "success"
-            self.progress.downloadFinised.emit(f"Download file saved as: {self.tempPath}")
+            self.progress.downloadFinised.emit(f"Downloaded to {self.tempPath}")
         except Exception:
             raise InstallFailedException(f"Failed to download file {self.fileUrl}")
 

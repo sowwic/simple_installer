@@ -7,7 +7,7 @@ class WelcomePage(QtWidgets.QWidget):
         super().__init__(parent)
 
         self.titleText = f"Welcome to the {softwareName} Setup Sizard"
-        self.welcomeText = f"""The Setup Wizard will install {softwareName} on your computer.\nClick Next to continue or Cancel  to exit Setup wizard"""
+        self.welcomeText = f"""The Setup Wizard will install {softwareName} on your computer.\nClick Next to continue or Cancel to exit Setup wizard"""
 
         self.createWidgets()
         self.createLayouts()
@@ -114,7 +114,7 @@ class ResultsPage(QtWidgets.QWidget):
     def setResult(self, status, description=""):
         if status != "success":
             self.resultTitle.setText("Installation failed!")
-            self.resultText.setText(f"There was and error during installation of {self.softwareName}")
+            self.resultText.setText(f"There was an error during installation of {self.softwareName}")
             if description:
                 self.descriptionText.setText(description)
             return status

@@ -7,7 +7,7 @@ from dsInstaller import pages
 
 
 class InstallDialog(QtWidgets.QMainWindow):
-    def __init__(self, installer: installFn.Installer, parent=None, title="", minSize=[600, 400]):
+    def __init__(self, installer: installFn.Installer, parent=None, title: str = "dsInstaller", minSize: list = [600, 400]):
         super().__init__(parent)
 
         self.installer = installer
@@ -131,7 +131,8 @@ class InstallDialog(QtWidgets.QMainWindow):
             self.installPage.progressBar.setValue((value))
             return
 
-        self.installPage.progressBar.setValue((value // operations) * 100)
+        percentage = int((value / operations) * 100)
+        self.installPage.progressBar.setValue(percentage)
         QtCore.QCoreApplication.processEvents()
         time.sleep(0.5)
 
