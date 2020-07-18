@@ -42,7 +42,11 @@ class Installer(object):
         # Init data
         self.progress = Progress()
         self.status = Status()
-        self.installDir = installDir
+        if installDir:
+            self.installDir = installDir
+        else:
+            self.installDir = self.DEFAULT_DIR
+
         self.repoName = ""
         self.fileUrl = fileUrl
         self.tempPath = os.path.join(os.getenv("TEMP"), "temp_{0}.zip".format(self.repoName))

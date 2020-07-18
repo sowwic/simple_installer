@@ -1,10 +1,12 @@
 import os
+import elevate
 from dsInstaller import installUI
 from dsInstaller import installFn
 from dsInstaller import styles
 from PySide2 import QtWidgets
 
-if __name__ == "__main__":
+
+def testInstall():
     # Init installer
     Installer = installFn.Installer(fileUrl="https://github.com/S0nic014/dsRenamingTool/archive/1.0.zip")
 
@@ -18,3 +20,8 @@ if __name__ == "__main__":
     window.show()
 
     app.exec_()
+
+
+if __name__ == "__main__":
+    elevate.elevate(show_console=False)
+    testInstall()

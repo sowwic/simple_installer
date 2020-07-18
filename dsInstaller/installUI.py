@@ -1,7 +1,6 @@
 import time
 from PySide2 import QtWidgets
 from PySide2 import QtCore
-from PySide2 import QtGui
 from dsInstaller import installFn
 from dsInstaller import pages
 
@@ -32,11 +31,11 @@ class InstallDialog(QtWidgets.QMainWindow):
         self.nextButton = QtWidgets.QPushButton("&Next >")
         self.cancelButton = QtWidgets.QPushButton("Cancel")
         self.welcomePage = pages.WelcomePage(softwareName=self.installer.repoName)
-        self.installDirPage = pages.DirectoryPage(defaultDir=self.installer.DEFAULT_DIR)
+        self.installDirPage = pages.DirectoryPage(defaultDir=self.installer.installDir)
         self.installPage = pages.InstallPage()
         self.resultPage = pages.ResultsPage(softwareName=self.installer.repoName)
         # Adjust
-        self.installDirPage.dirWidget.pathLineEdit.setText(self.installer.DEFAULT_DIR)
+        self.installDirPage.dirWidget.pathLineEdit.setText(self.installer.installDir)
 
     def createLayouts(self):
         self.mainLayout = QtWidgets.QVBoxLayout()
