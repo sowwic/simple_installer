@@ -1,3 +1,4 @@
+import time
 from PySide2 import QtWidgets
 import simple_installer.common_widgets as common_widgets
 
@@ -59,14 +60,12 @@ class InstallPage(QtWidgets.QWidget):
         self.create_connections()
 
     def create_widgets(self):
-        self.status_label = QtWidgets.QLabel()
         self.progress_bar = QtWidgets.QProgressBar()
         self.log_output = QtWidgets.QTextEdit()
         self.log_output.setReadOnly(True)
 
     def create_layouts(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.addWidget(self.status_label)
         self.main_layout.addWidget(self.progress_bar)
         self.main_layout.addWidget(self.log_output)
         self.setLayout(self.main_layout)
@@ -74,42 +73,10 @@ class InstallPage(QtWidgets.QWidget):
     def create_connections(self):
         pass
 
-
-class ResultsPage(QtWidgets.QWidget):
-    def __init__(self, software_name: str = "Program", parent=None):
-        super().__init__(parent)
-        self.software_name = software_name
-        self.create_widgets()
-        self.create_layouts()
-        self.create_connections()
-
-    def create_widgets(self):
-        self.title = QtWidgets.QLabel()
-        self.title.setStyleSheet("font-weight: bold;")
-        self.message = QtWidgets.QLabel()
-        self.message.setWordWrap(1)
-        self.description = QtWidgets.QLabel()
-        self.description.setStyleSheet("font-weight: bold;")
-        self.description.setWordWrap(1)
-
-    def create_layouts(self):
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.addWidget(self.title)
-        self.main_layout.addWidget(self.message)
-        self.main_layout.addWidget(self.description)
-        self.main_layout.addStretch()
-        self.setLayout(self.main_layout)
-
-    def create_connections(self):
-        pass
-
-    def set_result(self, status, description=""):
-        if status != "success":
-            self.title.setText("Installation failed!")
-            self.message.setText(f"There was an error during installation of {self.software_name}")
-            if description:
-                self.description.setText(description)
-            return status
-
-        self.title.setText("Installation completed.")
-        self.message.setText(f"{self.software_name} was installed successfully")
+    def update_progress_bar(self, value: int, operations: int = 0):
+        if not operations:
+            self.progress_bar.setValue(value)
+            return
+        percentage = value / operations * 100
+        self.progress_bar.setValue(percentage)
+        time.sleep(0.3)

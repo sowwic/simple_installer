@@ -6,12 +6,11 @@ import simple_installer
 
 def test_install():
     # Init installer
-    installer = simple_installer.Installer(fileUrl="https://github.com/S0nic014/dsRenamingTool/archive/1.0.zip")
-
+    installer = simple_installer.Installer(repo_name="S0nic014/dsRenamingTool",
+                                           api_token="")
     # Create app
     app = QtWidgets.QApplication(sys.argv)
-    # Create main window
-    window = simple_installer.InstallerWindow(installer, title="Test installer", min_size=(400, 200))
+    window = simple_installer.InstallerWindow(installer, title="Test installer")
     window.show()
     app.exec_()
 
