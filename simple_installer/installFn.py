@@ -118,7 +118,7 @@ class Installer(QtCore.QObject):
             zip_file.extractall(destination_dir)
             extracted_path = destination_dir / root_folder
             final_path = destination_dir / self.repo.name
-            if extracted_path.is_dir():
+            if final_path.is_dir():
                 answer = QtWidgets.QMessageBox.question(None,
                                                         "Existing directory",
                                                         f"Directory {final_path} already exists. Replace it?")
@@ -140,11 +140,11 @@ class Installer(QtCore.QObject):
         self.extract_file(self.temp_path, self.install_dir)
         self.made_progress.emit(3, 6)
 
-    def preInstall(self) -> None:
+    def pre_install(self) -> None:
         """Override"""
         pass
 
-    def postInstall(self) -> None:
+    def post_install(self) -> None:
         """Override"""
         pass
 
@@ -157,7 +157,7 @@ class Installer(QtCore.QObject):
         # Pre
         Logger.info("Running pre install tasks...")
         self.pre_install_started.emit()
-        self.preInstall()
+        self.pre_install()
         self.pre_install_completed.emit()
         self.made_progress.emit(1, 6)
         Logger.info("Pre install tasks completed.")
@@ -171,7 +171,7 @@ class Installer(QtCore.QObject):
         # Post
         Logger.info("Running post install tasks...")
         self.post_install_started.emit()
-        self.postInstall()
+        self.post_install()
         self.post_install_completed.emit()
         self.made_progress.emit(5, 6)
         Logger.info("Post install task completed.")

@@ -1,10 +1,10 @@
 
 ```py
 import pathlib
+import os
 import sys
 import elevate
 from PySide2 import QtWidgets
-from PySide2 import QtCore
 import simple_installer.pages as pages
 from simple_installer import Installer
 from simple_installer import InstallerWindow
@@ -16,15 +16,14 @@ class dsToolInstaller(Installer):
         self.tool_version = self.repo.get_latest_release().tag_name
         self.tool_name = self.repo.name
         self.maya_modules_dir = pathlib.Path().home() / "Documents" / "maya" / "modules"
-        self.module_file_path = self.maya_modules_dir / f"{self.tool_name}.mod"
         self.module_file_data = ""
 
     def post_install(self):
         """Creates .mod file with path to installed tool"""
         installed_path = self.install_dir / self.tool_name
-        self.module_file_data = f"+ {self.tool_name} {self.version} {installed_path}"\
-                                "\nscripts: {installed_path}"
-        self.createFile(self.module_file_path, self.module_file_data)
+        self.module_file_data = f"+ {self.tool_name} {self.tool_version} {installed_path}"\
+                                f"\nscripts: {installed_path}"
+        self.create_file(self.maya_modules_dir / f"{self.tool_name}.mod", self.module_file_data)
 
 
 class dsInstallDialog(InstallerWindow):
@@ -34,21 +33,21 @@ class dsInstallDialog(InstallerWindow):
 
     def create_widgets(self):
         super().create_widgets()
-        self.mod_page = pages.DirectoryPage(default_dir=self.installer.maya_modules_dir)
-        self.mod_page.dirWidget.group.setTitle("Maya modules folder")
+        self.mod_page = pages.DirectoryPage(default_dir=self.installer.maya_modules_dir.as_posix())
+        self.mod_page.dir_widget.group.setTitle("Maya modules folder")
         self.stack.insertWidget(2, self.mod_page)
 
-    def createConnections(self):
-        super().createConnections()
+    def create_connections(self):
+        super().create_connections()
         self.mod_page.dir_widget.line_edit.textChanged.connect(self.set_modules_dir)
 
-    @QtCore.Slot(str)
     def set_modules_dir(self, path: str):
         self.installer.maya_modules_dir = pathlib.Path(path)
+        print(self.installer.maya_modules_dir)
 
 
 def main():
-    api_token = ""
+    api_token = os.getenv("INSTALLER_TOKEN")
     toolInstall = dsToolInstaller(api_token)
     # Create app
     app = QtWidgets.QApplication(sys.argv)
