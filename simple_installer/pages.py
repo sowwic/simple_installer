@@ -61,6 +61,7 @@ class InstallPage(QtWidgets.QWidget):
 
     def create_widgets(self):
         self.progress_bar = QtWidgets.QProgressBar()
+        self.progress_bar.setRange(0, 0)
         self.log_output = QtWidgets.QTextEdit()
         self.log_output.setReadOnly(True)
 
@@ -72,11 +73,3 @@ class InstallPage(QtWidgets.QWidget):
 
     def create_connections(self):
         pass
-
-    def update_progress_bar(self, value: int, operations: int = 0):
-        if not operations:
-            self.progress_bar.setValue(value)
-            return
-        percentage = value / operations * 100
-        self.progress_bar.setValue(percentage)
-        time.sleep(0.3)

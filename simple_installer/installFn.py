@@ -41,14 +41,13 @@ class Installer(QtCore.QObject):
         self.install_dir = install_dir
         if not self.install_dir.is_dir():
             self.install_dir = self.default_dir
-        self.temp_path = pathlib.Path(os.getenv("TEMP"), pathlib.Path.cwd()) / f"temp_{self.repo.name}.zip"
 
     @property
     def default_dir(self):
         if platform.system() == "Windows":
             return os.getenv("programfiles", "")
         else:
-            return ""
+            return "."
 
     @property
     def install_dir(self) -> pathlib.Path:
@@ -85,60 +84,72 @@ class Installer(QtCore.QObject):
             Logger.exception(f"Failed to create file {file_path.as_posix()}")
             raise Installer.FailedException()
 
-    def download_latest_release(self):
+    def download_latest_source(self, download_path: pathlib.Path):
         Logger.info(f"Downloading latest release for {self.repo.name}")
         try:
             release = self.repo.get_latest_release()
-            self.create_file(self.temp_path)
-            self.download_file(release.zipball_url, self.temp_path)
+            self.download_file(release.zipball_url, download_path.as_posix())
         except GithubException:
             Logger.exception(f"Failed to get latest release for {self.repo.full_name}")
             raise Installer.FailedException()
 
+    def download_latest_asset(self, download_dir: pathlib.Path):
+        Logger.info(f"Downloading latest asset for {self.repo.name}")
+        downloaded_assets = []
+        try:
+            release = self.repo.get_latest_release()
+            for asset in release.get_assets():
+                download_path = self.install_dir / asset.name
+                self.download_file(asset.browser_download_url, download_path)
+                downloaded_assets.append(download_path)
+            return downloaded_assets
+
+        except GithubException:
+            Logger.exception(f"Failed to get latest asset for {self.repo.full_name}")
+            raise Installer.FailedException
+
     @classmethod
-    def download_file(cls, url: str, file_name: pathlib.Path):
+    def download_file(cls, url: str, file_path: pathlib.Path):
         Logger.info(f"Downloading file {url}")
         try:
             with requests.get(url) as req_file:
-                with open(file_name.as_posix(), "wb") as local_file:
+                with open(file_path.as_posix(), "wb") as local_file:
                     for chunk in req_file.iter_content(chunk_size=8192):
                         if chunk:
                             local_file.write(chunk)
-            Logger.info(f"Dowloaded file to: {file_name.as_posix()}")
-            return file_name
+            Logger.info(f"Dowloaded file to: {file_path.as_posix()}")
+            return file_path
         except Exception:
             Logger.exception(f"Failed to download from: {url}")
             raise Installer.FailedException
 
-    def extract_file(self, source: pathlib.Path, destination_dir: pathlib.Path):
+    def extract_file(self, source: pathlib.Path, destination_dir: pathlib.Path, new_extracted_name: str = None):
         Logger.info(f"Extracting temp file {source.as_posix()}")
         try:
             zip_file = ZipFile(source)
             root_folder = zip_file.namelist()[0]
             zip_file.extractall(destination_dir)
             extracted_path = destination_dir / root_folder
-            final_path = destination_dir / self.repo.name
-            if final_path.is_dir():
-                answer = QtWidgets.QMessageBox.question(None,
-                                                        "Existing directory",
-                                                        f"Directory {final_path} already exists. Replace it?")
-                if answer == QtWidgets.QMessageBox.Yes:
-                    shutil.rmtree(final_path)
+            if new_extracted_name:
+                final_path = destination_dir / new_extracted_name
+                if final_path.is_dir():
+                    answer = QtWidgets.QMessageBox.question(None,
+                                                            "Existing directory",
+                                                            f"Directory {final_path} already exists. Replace it?")
+                    if answer == QtWidgets.QMessageBox.Yes:
+                        shutil.rmtree(final_path)
+                        extracted_path.rename(final_path)
+                else:
                     extracted_path.rename(final_path)
-            else:
-                extracted_path.rename(final_path)
             Logger.info(f"Extracted zip to {extracted_path.as_posix()}")
             return extracted_path
+
         except Exception:
             Logger.exception("Failed to extract file")
             raise Installer.FailedException
 
     def install(self) -> None:
-        Logger.info("Installing...")
-        self.download_latest_release()
-        self.made_progress.emit(2, 6)
-        self.extract_file(self.temp_path, self.install_dir)
-        self.made_progress.emit(3, 6)
+        pass
 
     def pre_install(self) -> None:
         """Override"""
@@ -148,24 +159,25 @@ class Installer(QtCore.QObject):
         """Override"""
         pass
 
+    def cleanup(self) -> None:
+        """Override"""
+        pass
+
     def run(self) -> None:
         """Run installation"""
         Logger.info("Initializing ...")
         self.started.emit()
-        self.made_progress.emit(0, 6)
 
         # Pre
         Logger.info("Running pre install tasks...")
         self.pre_install_started.emit()
         self.pre_install()
         self.pre_install_completed.emit()
-        self.made_progress.emit(1, 6)
         Logger.info("Pre install tasks completed.")
 
         # Install
         Logger.info("Installing...")
         self.install()
-        self.made_progress.emit(4, 6)
         Logger.info("Install tasks complete.")
 
         # Post
@@ -173,14 +185,12 @@ class Installer(QtCore.QObject):
         self.post_install_started.emit()
         self.post_install()
         self.post_install_completed.emit()
-        self.made_progress.emit(5, 6)
         Logger.info("Post install task completed.")
 
         # Cleanup
         Logger.info("Cleaning up...")
         self.cleanup_started.emit()
-        os.remove(self.temp_path)
+        self.cleanup()
         self.cleanup_completed.emit()
-        self.made_progress.emit(6, 6)
         self.done.emit(0)
         Logger.info("Done.")

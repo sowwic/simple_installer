@@ -70,7 +70,6 @@ class InstallerWindow(QtWidgets.QMainWindow):
         self.stack.currentChanged.connect(self.update_buttons)
         self.dir_page.dir_widget.line_edit.textChanged.connect(self.installer.set_install_dir)
         Logger.signal_handler().emitter.message_logged.connect(self.install_page.log_output.append)
-        self.installer.made_progress.connect(self.install_page.update_progress_bar)
         self.installer.done.connect(lambda: self.cancel_button.setText("Close"))
 
     @QtCore.Slot()

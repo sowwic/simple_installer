@@ -8,7 +8,7 @@ import simple_installer
 def test_install():
     # Init installer
     api_token = os.getenv("INSTALLER_TOKEN")
-    installer = simple_installer.Installer(repo_name="S0nic014/dsRenamingTool",
+    installer = simple_installer.Installer(repo_name="S0nic014/dsPlayblast",
                                            api_token=api_token)
     # Create app
     app = QtWidgets.QApplication(sys.argv)
@@ -18,5 +18,5 @@ def test_install():
 
 
 if __name__ == "__main__":
-    # elevate.elevate(show_console=False)
+    elevate.elevate(show_console=False)
     test_install()
